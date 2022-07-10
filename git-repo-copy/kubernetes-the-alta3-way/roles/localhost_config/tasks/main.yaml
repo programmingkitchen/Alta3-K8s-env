@@ -1,0 +1,44 @@
+- name: Download and unarchive Helm
+  unarchive:
+    remote_src: yes
+    src: "{{ helm.url }}"
+    dest: "{{ helm.dest }}"
+    extra_opts: "{{ helm.extra_opts }}"
+  become: True
+
+
+- name: bchd-k8s-config - setup localhost loadbalancer for kubectl (as admin)
+  shell: kubectl config set-cluster {{ cluster_name }} \
+         --certificate-authority={{ ca_pem_file }}  \
+         --embed-certs=true \
+         --server={{ localhost_lb_apiserver_address }}
+
+- name: bchd-k8s-config - setup creds for admin user
+  shell: kubectl config set-credentials admin \ 
+         --client-certificate={{ admin_pem_file }} \
+         --client-key={{ admin_key_file }} \ 
+
+- name: bchd-k8s-config - setup context for the admin user
+  shell: kubectl config set-context {{ cluster_name }} 
+         --cluster={{ cluster_name }} \
+         --user=admin
+
+- name: bchd-k8s-config - setup use-context for the admin user
+  shell: kubectl config use-context {{ cluster_name }}
+
+- name: ensure j2cli installed for setup functions
+  apt:
+   name: j2cli
+   state: present
+  become: yes
+
+- name: setup setup
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  loop:
+   - src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/setup"
+     dest: "{{ localhost_home_dir }}/.local/bin/setup"
+   - src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/tl"
+     dest: "{{ localhost_home_dir }}/.local/bin/tl"

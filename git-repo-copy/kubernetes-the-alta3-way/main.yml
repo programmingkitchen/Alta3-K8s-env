@@ -1,0 +1,49 @@
+---
+- name: connectivity and fact gathering
+  hosts: all
+  gather_facts: True
+  tasks: [ ]
+
+- name: make certs & gen configs
+  hosts: localhost
+  roles:
+   - name: make_certs
+   - name: kube_config
+   - name: localhost_config
+
+- name: deploy etcd
+  hosts: etcd
+  gather_facts: True
+  roles:
+   - name: etcd
+
+- name: deploy k8s controllers
+  hosts: controllers
+  gather_facts: True
+  roles:
+   - name: controller_install
+
+- name: deploy load balancers
+  hosts: localhost,nodes
+  gather_facts: False
+  roles:
+   - name: nginx_localhost_load_balancer
+   - name: trusted_ca
+
+- name: configure rbac
+  hosts: localhost
+  roles:
+   - name: rbac
+     
+- name: deploy k8s nodes
+  hosts: nodes
+  gather_facts: False
+  roles:
+   - name: node_install
+
+- name: deploy k8s services
+  hosts: localhost
+  gather_facts: False
+  roles:
+   - name: calico
+   - name: kube-dns

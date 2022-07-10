@@ -1,0 +1,21 @@
+- name: Containerd Update
+  hosts: nodes
+  tasks:
+
+  - name: mkdir /etc/containerd
+    file:
+      path: /etc/containerd
+      state: directory
+    become: true
+
+  - name: map registry lookups to default to bchd
+    copy:
+      src: "/home/student/mycode/config/containerd_config1-23.toml"
+      dest: "/etc/containerd/config.toml"
+    become: True
+
+  - name: restart containerd
+    systemd:
+      name: containerd
+      state: restarted
+    become: True

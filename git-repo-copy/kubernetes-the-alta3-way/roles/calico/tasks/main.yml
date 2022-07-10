@@ -1,0 +1,15 @@
+
+- name: Generate a calico installation yaml files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+  - src: "{{ role_path }}/templates/calico.yaml.j2" 
+    dest: "{{ calico_manifest_config }}"
+
+- name: Apply calico service 
+  command: "kubectl apply -f {{ calico_manifest_config }}"
+
+- name: Allow Calico Nodes services to fully initialize
+  pause:
+    seconds: "{{ pause_seconds }}"

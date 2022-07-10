@@ -1,0 +1,89 @@
+---
+- name: Setup the config file for each node
+  command: kubectl config set-cluster {{ cluster_name }} \
+           --certificate-authority={{ ca_pem_file }} \
+           --embed-certs=true \ 
+           --server={{ localhost_lb_apiserver_address }} \
+           --kubeconfig={{ public_fqdn }}.kubeconfig
+  args: 
+    chdir: "{{ config_dir }}"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
+  loop: "{{ groups['nodes'] }}"
+
+- name: Setup the credentials for each node
+  command: kubectl config set-credentials system:node:{{ public_fqdn }} \
+           --client-certificate={{ cert_dir }}/{{ public_fqdn }}.pem \
+           --client-key={{ cert_dir }}/{{ public_fqdn }}-key.pem \
+           --embed-certs=true \
+           --kubeconfig={{ public_fqdn }}.kubeconfig
+  args: 
+    chdir: "{{ config_dir }}"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
+  loop: "{{ groups['nodes'] }}"
+
+- name: Setup the context default for each node
+  command: kubectl config set-context default \
+           --cluster={{ cluster_name }} \
+           --user=system:node:{{ public_fqdn }} \
+           --kubeconfig={{ public_fqdn }}.kubeconfig
+  args: 
+    chdir: "{{ config_dir }}"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
+  loop: "{{ groups['nodes'] }}"
+  
+- name: Setup the use-context default for each node
+  command: kubectl config use-context default \
+           --kubeconfig={{ public_fqdn }}.kubeconfig
+  args: 
+    chdir: "{{ config_dir }}"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
+  loop: "{{ groups['nodes'] }}"
+
+# multiple services
+- name: auth kubeconfig files - multiple services - create
+  command: kubectl config set-cluster {{ cluster_name }} \
+           --certificate-authority={{ ca_pem_file }} \
+           --embed-certs=true \
+           --server={{ item.server }} \
+           --kubeconfig={{ item.config }} 
+  args:
+    chdir: "{{ config_dir }}"
+  loop: "{{ auth_kubeconfigs }}"
+  loop_control:
+    label: "config={{ item.config }}"
+  
+- name: auth kubeconfig - multiple services - set credentials 
+  command: kubectl config set-credentials {{ item.user }} \
+           --client-certificate={{ item.pem }} \
+           --client-key={{ item.key }} \
+           --embed-certs=true \
+           --kubeconfig={{ item.config }} 
+  args:
+    chdir: "{{ config_dir }}"
+  loop: "{{ auth_kubeconfigs }}"
+  loop_control:
+    label: "config={{ item.config }}"
+  
+- name: auth kubeconfig - multiple services - set context
+  command: kubectl config set-context default-system \
+           --cluster={{ cluster_name }} \
+           --user={{ item.user }} \
+           --kubeconfig={{ item.config }} 
+  args:
+    chdir: "{{ config_dir }}"
+  loop: "{{ auth_kubeconfigs }}"
+  loop_control:
+    label: "config={{ item.config }}"
+
+- name: auth kubeconfig - muiltiple services - use context
+  command: kubectl config use-context default-system \
+           --kubeconfig={{ item.config }} 
+  args:
+    chdir: "{{ config_dir }}"
+  loop: "{{ auth_kubeconfigs }}"
+  loop_control:
+    label: "config={{ item.config }}"

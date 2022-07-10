@@ -1,0 +1,210 @@
+---
+- name: Create cert directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ cert_dir }}"
+  - "{{ config_dir }}"
+  - "{{ csr_dir }}"
+
+- name: Install dependencies with get_url -> cfssl, cfssljson, kubectl
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+  - { url: "{{ cfssl_url }}", 
+      dest: /usr/local/bin/cfssl, 
+      mode: '0755' }
+  - { url: "{{ cfssljson_url }}", 
+      dest: /usr/local/bin/cfssljson, 
+      mode: '0755' }
+  - { url: "{{ kubectl.url }}",
+      dest: "{{ kubectl.path }}",
+      mode: '0755' }
+  become: True
+
+- name: Deploy configuration templates
+  template: 
+    src: "{{ role_path }}/templates/{{ item }}.json.j2"
+    dest: "{{ config_dir }}/{{ item }}.json"
+  loop:
+   - "ca-config"
+
+- name: Deploy certificate generation (csr) templates
+  template: 
+    src: "{{ role_path }}/templates/{{ item }}-csr.json.j2"
+    dest: "{{ csr_dir }}/{{ item }}-csr.json"
+  loop: "{{ k8s_certs_list }}"
+
+- name: Generate misc service configuration templates
+  template: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+  - src: "{{ role_path }}/templates/kube-scheduler.yaml.j2"
+    dest: "{{ kube_scheduler_config_file }}"
+
+- name: Generate the certificate config file for nodes (file same on all nodes)
+  template:
+    src: "{{ role_path }}/templates/node-csr.json.j2" 
+    dest: "{{ csr_dir }}/{{ public_fqdn }}-csr.json"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
+  loop: "{{ groups['nodes'] }}"
+       
+- name: Generate a self-signed CA cert and private key for the k8s cloud
+  shell: "cfssl gencert -initca {{ csr_dir }}/ca-csr.json | cfssljson -bare ca"
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ ca_pem_file }}" # also ca-key.pem, ca.csr
+
+    # Removed, symlink works
+    #- name: Create crt version of the ca.pem cert file
+    #  shell: "openssl x509 -in {{ ca_pem_file }} -inform PEM -out {{ ca_crt_file }}"
+    #  args:
+    #    chdir: "{{ cert_dir }}"
+    #    creates: "{{ ca_crt_file }}"
+
+- name: Generate Certificate and private key for k8s API server and etcd
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -hostname={{ apiserver_cluster_ip }},{{ controller_ips_csv }},{{ controller_fqdn_csv }},127.0.0.1,kubernetes.default \
+         -profile=kubernetes \
+         {{ csr_dir }}/kubernetes-csr.json | cfssljson -bare kubernetes
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ k8s_pem_file }}" # also kubernetes.csr kubernetes-key.pem
+
+- name: Generate admin certificates 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ csr_dir }}/admin-csr.json | cfssljson -bare admin 
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ admin_pem_file }}" # also admin.csr admin-key.pem
+
+- name: Generate kube-controller-manager client cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ csr_dir }}/kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ kube_controller_manager_pem_file }}" # also kube-controller-manager.csr kube-controller-manager-key.pem
+
+- name: Generate kube-proxy client cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ csr_dir }}/kube-proxy-csr.json | cfssljson -bare kube-proxy
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ kube_proxy_pem_file }}" # also kube-proxy.csr kube-proxy-key.pem
+
+- name: Generate kube-scheduler client cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ csr_dir }}/kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ kube_scheduler_pem_file }}" # also kube-scheduler.csr kube-scheduler-key.pem
+
+- name: Generate service-account client cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ csr_dir }}/service-account-csr.json | cfssljson -bare service-account
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ service_account_pem_file }}" # also service-account.csr service-account-key.pem
+
+- name: Generate registry web cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ csr_dir }}/registry-web-csr.json | cfssljson -bare registry-web
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ registry_web_pem_file }}" # also .csr .pem
+
+- name: Generate front-proxy-client (kube-apiserver aggregation layer) cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ csr_dir }}/front-proxy-client-csr.json | cfssljson -bare front-proxy-client
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ front_proxy_client_key_file }}" # also .csr .pem
+
+- name: Generate the specific certificate and Private key for each node when it does not already exist
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -hostname={{ hostname }},{{ public_ip }},{{ public_fqdn }},{{ public_hostname }} \
+         -profile=kubernetes {{ csr_dir }}/{{ public_fqdn }}-csr.json | cfssljson -bare {{ public_fqdn }}
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ cert_dir }}/{{ hostvars[item]['public_fqdn'] }}.pem"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
+    public_ip: "{{ hostvars[item]['public_ip'] }}"
+    public_hostname: "{{ hostvars[item]['public_hostname'] }}"
+    hostname: "{{ hostvars[item].inventory_hostname }}"
+  loop: "{{ groups['nodes'] }}"
+
+- name: Discover if encryption config has already been generated
+  stat: 
+    path: "{{ encryption_config_file }}"
+  register: ecf
+
+- name: Generate an encryption key 
+  shell: head -c 32 /dev/urandom | base64
+  args:
+    creates: "{{ encryption_config_file }}"
+  register: encryption_key # used in template file
+  when: ecf.stat.exists == False
+
+- name: Generate the encryption config file
+  template: 
+    src: "{{ role_path }}/templates/encryption-config.yaml.j2"
+    dest: "{{ encryption_config_file }}"
+  when: ecf.stat.exists == False
+
+# until cfssl makes it possible to choose file extensions, symlinks will have to work
+# https://github.com/cloudflare/cfssl/issues/1094
+- name: Create symbolic links to all generated certificates (k8s best practice names)
+  file:
+    src: "{{ cert_dir }}/{{ item }}.pem"
+    dest: "{{ cert_dir }}/{{ item }}.crt"
+    state: link
+  loop: "{{ k8s_certs_list }}"
+
+# until cfssl makes it possible to choose file extensions, symlinks will have to work
+# https://github.com/cloudflare/cfssl/issues/1094
+- name: Create symbolic links to all generated keys (k8s best practice names)
+  file:
+    src: "{{ cert_dir }}/{{ item }}-key.pem"
+    dest: "{{ cert_dir }}/{{ item }}.key"
+    state: link
+  loop: "{{ k8s_certs_list }}"

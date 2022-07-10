@@ -1,0 +1,80 @@
+---
+ - name: Create k8s directories on controllers
+   file:
+     path: "{{ item }}"
+     state: directory
+   loop:
+   - "/var/lib/etcd"
+   - "/var/lib/kubernetes"
+   become: True
+ 
+ - name: Copy Certs and Config to Controllers
+   copy:
+     src: "{{ item.src }}"
+     dest: "{{ item.dest }}"
+     mode: "{{ item.mode }}"
+   loop: "{{ deployed_cert_and_config_files }}"
+   become: True
+ 
+ - name: Download the controller service binaries
+   get_url:
+     url: "{{ item.url }}"
+     dest: "{{ item.path }}"
+     mode: "{{ item.mode }}"
+   loop: "{{ controller_services }}"
+   loop_control: 
+     label: "{{ item.display_name }} -> {{ item.path }}"
+   become: True
+ 
+ - name: Push the config files for the controller services
+   template:
+     src: "{{ item.service_j2 }}"
+     dest: "{{ item.service_path }}"
+   loop: "{{ controller_services }}"
+   loop_control: 
+     label: "{{ item.display_name }} -> {{ item.service_path }}"
+   become: True 
+ 
+ - name: Download Kubernetes kubectl 
+   get_url:
+     url: "{{ item.url }}"
+     dest: "{{ item.dest }}"
+     mode: "{{ item.mode }}"
+   loop:
+    - url: "{{ kubectl.url }}"
+      dest: "{{ kubectl.path }}"
+      mode: '0755'
+   become: True    
+ 
+ - name: Reload systemd manager
+   systemd: 
+     daemon_reload: True
+   become: True
+   
+ # TODO make this a handler
+ - name: Reload the daemon for the services
+   service: 
+     name: "{{ item.name }}"
+     enabled: yes
+     state: restarted
+   loop: "{{ controller_services }}"
+   loop_control: 
+     label: "{{ item.display_name }} Service -> {{ item.name }}"
+   become: True
+ 
+ - name: Allow Kubernetes API Server to fully initialize
+   pause:
+     seconds: "{{ pause_seconds }}"
+
+ - name: Create a route from controllers to the service ip cidr
+   vars:
+     nodes: "{{ groups['nodes'] }}"
+   template: 
+     src: "{{  role_path  }}/templates/service-cluster-route.sh.j2"
+     dest: "/etc/network/if-up.d/service-cluster-route.sh"
+     mode: "0775"
+   become: True
+
+ - name: execute ifup script to insert route from controllers to service ip cidr
+   command: "/etc/network/if-up.d/service-cluster-route.sh"
+   become: True
