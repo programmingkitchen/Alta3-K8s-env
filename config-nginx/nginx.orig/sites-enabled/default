@@ -1,0 +1,15 @@
+server {
+
+  listen 8080 default_server;
+  listen [::]:8080 default_server;
+
+  root /home/student/static;
+  location / {
+    autoindex on;
+  }
+
+  # never serve a default page
+  # always auto index
+  index snarfblatsnorkhbonzabi;
+
+}
