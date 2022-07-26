@@ -1,0 +1,113 @@
+UID          PID    PPID  C STIME TTY          TIME CMD
+root           1       0  0 Jul07 ?        00:00:30 /sbin/init
+root           2       0  0 Jul07 ?        00:00:00 [kthreadd]
+root           3       2  0 Jul07 ?        00:00:00 [rcu_gp]
+root           4       2  0 Jul07 ?        00:00:00 [rcu_par_gp]
+root           5       2  0 Jul07 ?        00:00:00 [netns]
+root           7       2  0 Jul07 ?        00:00:00 [kworker/0:0H-events_highpri]
+root          10       2  0 Jul07 ?        00:00:00 [mm_percpu_wq]
+root          11       2  0 Jul07 ?        00:00:00 [rcu_tasks_rude_]
+root          12       2  0 Jul07 ?        00:00:00 [rcu_tasks_trace]
+root          13       2  0 Jul07 ?        00:00:03 [ksoftirqd/0]
+root          14       2  0 Jul07 ?        00:00:14 [rcu_sched]
+root          15       2  0 Jul07 ?        00:00:12 [migration/0]
+root          16       2  0 Jul07 ?        00:00:00 [idle_inject/0]
+root          17       2  0 Jul07 ?        00:00:00 [cpuhp/0]
+root          18       2  0 Jul07 ?        00:00:00 [cpuhp/1]
+root          19       2  0 Jul07 ?        00:00:00 [idle_inject/1]
+root          20       2  0 Jul07 ?        00:00:11 [migration/1]
+root          21       2  0 Jul07 ?        00:00:04 [ksoftirqd/1]
+root          23       2  0 Jul07 ?        00:00:00 [kworker/1:0H-kblockd]
+root          24       2  0 Jul07 ?        00:00:00 [kdevtmpfs]
+root          25       2  0 Jul07 ?        00:00:00 [inet_frag_wq]
+root          26       2  0 Jul07 ?        00:00:00 [kauditd]
+root          27       2  0 Jul07 ?        00:00:01 [khungtaskd]
+root          28       2  0 Jul07 ?        00:00:00 [oom_reaper]
+root          29       2  0 Jul07 ?        00:00:00 [writeback]
+root          30       2  0 Jul07 ?        00:01:35 [kcompactd0]
+root          31       2  0 Jul07 ?        00:00:00 [ksmd]
+root          32       2  0 Jul07 ?        00:00:02 [khugepaged]
+root          79       2  0 Jul07 ?        00:00:00 [kintegrityd]
+root          80       2  0 Jul07 ?        00:00:00 [kblockd]
+root          81       2  0 Jul07 ?        00:00:00 [blkcg_punt_bio]
+root          82       2  0 Jul07 ?        00:00:00 [tpm_dev_wq]
+root          83       2  0 Jul07 ?        00:00:00 [ata_sff]
+root          84       2  0 Jul07 ?        00:00:00 [md]
+root          85       2  0 Jul07 ?        00:00:00 [edac-poller]
+root          86       2  0 Jul07 ?        00:00:00 [devfreq_wq]
+root          87       2  0 Jul07 ?        00:00:00 [watchdogd]
+root          89       2  0 Jul07 ?        00:00:29 [kworker/0:1H-kblockd]
+root          91       2  0 Jul07 ?        00:00:06 [kswapd0]
+root          92       2  0 Jul07 ?        00:00:00 [ecryptfs-kthrea]
+root          94       2  0 Jul07 ?        00:00:00 [kthrotld]
+root          95       2  0 Jul07 ?        00:00:00 [acpi_thermal_pm]
+root          97       2  0 Jul07 ?        00:00:00 [scsi_eh_0]
+root          98       2  0 Jul07 ?        00:00:00 [scsi_tmf_0]
+root          99       2  0 Jul07 ?        00:00:00 [scsi_eh_1]
+root         100       2  0 Jul07 ?        00:00:00 [scsi_tmf_1]
+root         102       2  0 Jul07 ?        00:00:00 [vfio-irqfd-clea]
+root         103       2  0 Jul07 ?        00:00:00 [mld]
+root         104       2  0 Jul07 ?        00:00:00 [ipv6_addrconf]
+root         114       2  0 Jul07 ?        00:00:00 [kstrp]
+root         117       2  0 Jul07 ?        00:00:00 [zswap-shrink]
+root         118       2  0 Jul07 ?        00:00:00 [kworker/u5:0]
+root         123       2  0 Jul07 ?        00:00:00 [charger_manager]
+root         124       2  0 Jul07 ?        00:00:35 [kworker/1:1H-kblockd]
+root         165       2  0 Jul07 ?        00:00:00 [cryptd]
+root         235       2  0 Jul07 ?        00:00:00 [raid5wq]
+root         282       2  0 Jul07 ?        00:00:07 [jbd2/sda1-8]
+root         283       2  0 Jul07 ?        00:00:00 [ext4-rsv-conver]
+root         357       1  0 Jul07 ?        00:00:10 /lib/systemd/systemd-journald
+root         375       2  0 Jul07 ?        00:00:00 [ipmi-msghandler]
+root         381       2  0 Jul07 ?        00:00:00 [kaluad]
+root         385       2  0 Jul07 ?        00:00:00 [kmpath_rdacd]
+root         387       2  0 Jul07 ?        00:00:00 [kmpathd]
+root         388       2  0 Jul07 ?        00:00:00 [kmpath_handlerd]
+root         389       1  0 Jul07 ?        00:04:08 /sbin/multipathd -d -s
+root         400       1  0 Jul07 ?        00:00:04 /lib/systemd/systemd-udevd
+systemd+     551       1  0 Jul07 ?        00:00:08 /lib/systemd/systemd-networkd
+root         588       1  0 Jul07 ?        00:00:03 /usr/sbin/cron -f -P
+message+     589       1  0 Jul07 ?        00:00:02 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root         598       1  0 Jul07 ?        00:01:02 /usr/sbin/irqbalance --foreground
+root         600       1  0 Jul07 ?        00:00:00 /usr/libexec/polkitd --no-debug
+syslog       602       1  0 Jul07 ?        00:00:01 /usr/sbin/rsyslogd -n -iNONE
+root         607       1  0 Jul07 ?        00:00:04 /lib/systemd/systemd-logind
+root         610       1  0 Jul07 ?        00:01:27 /usr/libexec/udisks2/udisksd
+root         615       1  0 Jul07 ttyS0    00:00:00 /sbin/agetty -o -p -- \u --keep-baud 115200,57600,38400,9600 ttyS0 vt220
+root         618       1  0 Jul07 tty1     00:00:00 /sbin/agetty -o -p -- \u --noclear tty1 linux
+root         638       1  0 Jul07 ?        00:00:00 /usr/sbin/ModemManager
+root         848       1  0 Jul07 ?        00:00:10 /usr/sbin/dhcpcd
+root        1345       1  0 Jul07 ?        00:00:15 /usr/libexec/packagekitd
+_chrony     2919       1  0 Jul07 ?        00:00:10 /usr/sbin/chronyd -F 1
+_chrony     2920    2919  0 Jul07 ?        00:00:00 /usr/sbin/chronyd -F 1
+root        3207       1  0 Jul07 ?        00:27:28 /usr/bin/containerd
+root        3335       1  0 Jul07 ?        00:01:02 /usr/sbin/haveged --Foreground --verbose=1
+root        4002       1  0 Jul07 ?        00:05:44 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+root        4207       1  0 Jul07 ?        00:00:00 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+student     4662       1  0 Jul07 ?        00:00:40 /opt/ttyd/ttyd --interface 0.0.0.0 --port 2222 --client-option disableLeaveAlert=true --client-option titleFixed=bchd Alta3 Terminal --client-option theme={"background":"#0f0f0f", "black":"#000000", "red":"#eb008a", "green":"#37b349", "yellow": "#f8ca12", "blue":"#168ee9", "magenta":"#b31e8d", "cyan":"#00aabb", "white":"#ffffff", "brightBlack": "#505050", "brightBlue":"#168ee9", "brightCyan": "#00aabb", "brightMagenta":"#b31e8d", "brightRed":"#eb008a", "brightWhite":"#ffffff", "brightYellow": "#f9ca12", "brightGreen": "#37b349", "cursor":"#eb008a"} /usr/bin/tmux new -A -s ttyd
+student     4670       1  0 Jul07 ?        00:00:03 /opt/ttyd/ttyd --interface 0.0.0.0 --port 2223 --client-option disableLeaveAlert=true --client-option titleFixed=bchd Alta3 Recovery --client-option theme={"background":"#0f0f0f", "black":"#000000", "red":"#eb008a", "green":"#37b349", "yellow": "#f8ca12", "blue":"#168ee9", "magenta":"#b31e8d", "cyan":"#00aabb", "white":"#ffffff", "brightBlack": "#505050", "brightBlue":"#168ee9", "brightCyan": "#00aabb", "brightMagenta":"#b31e8d", "brightRed":"#eb008a", "brightWhite":"#ffffff", "brightYellow": "#f9ca12", "brightGreen": "#37b349", "cursor":"#eb008a"} /bin/bash
+student     5195       1  0 Jul07 ?        00:00:00 /home/student/.local/lib/code-server-4.2.0-linux-amd64/lib/node /home/student/.local/lib/code-server-4.2.0-linux-amd64
+student     5226    5195  0 Jul07 ?        00:07:22 /home/student/.local/lib/code-server-4.2.0-linux-amd64/lib/node /home/student/.local/lib/code-server-4.2.0-linux-amd64
+root        6710       1  0 Jul08 ?        00:02:03 /usr/lib/snapd/snapd
+student     7227       1  0 Jul08 ?        00:00:37 /usr/bin/tmux new -A -s ttyd
+student     7242    5226  0 Jul08 ?        00:01:44 /home/student/.local/lib/code-server-4.2.0-linux-amd64/lib/node /home/student/.local/lib/code-server-4.2.0-linux-amd64/lib/vscode/out/bootstrap-fork --type=ptyHost
+root       12175    4002  0 Jul10 ?        00:00:02 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2345 -container-ip 172.17.0.3 -container-port 5000
+root       12184    4002  0 Jul10 ?        00:00:02 /usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 2345 -container-ip 172.17.0.3 -container-port 5000
+root       12200       1  0 Jul10 ?        00:03:20 /usr/bin/containerd-shim-runc-v2 -namespace moby -id 48793d233a80ce5d468e7c022f92c36b392a6b3692ccbc0cb78fe433b30eb6d0 -address /run/containerd/containerd.sock
+root       12222   12200  0 Jul10 ?        00:02:38 registry serve /etc/docker/registry/config.yml
+uuidd      12903       1  0 Jul10 ?        00:00:00 /usr/sbin/uuidd --socket-activation
+root       16464       1  0 Jul10 ?        00:00:00 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+www-data   16465   16464  0 Jul10 ?        00:00:00 nginx: worker process
+www-data   16466   16464  0 Jul10 ?        00:00:02 nginx: worker process
+root       43782       1  0 Jul23 ?        00:00:00 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+root       43790       1  0 Jul23 ?        00:00:00 /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal
+student    49602    7227  0 Jul25 pts/1    00:00:01 -bash
+root       50936       2  0 06:43 ?        00:00:07 [kworker/1:1-events]
+root       51349       2  0 16:32 ?        00:00:00 [kworker/0:1-events]
+root       51356       2  0 16:32 ?        00:00:03 [kworker/1:3-events]
+root       51612       2  0 17:18 ?        00:00:12 [kworker/0:3-events]
+root       51746       2  0 21:50 ?        00:00:00 [kworker/u4:3-ext4-rsv-conversion]
+root       51750       2  0 22:04 ?        00:00:00 [kworker/u4:0-events_unbound]
+root       51755       2  0 22:17 ?        00:00:00 [kworker/u4:2-events_power_efficient]
+student    51756    4662  0 22:17 pts/0    00:00:00 /usr/bin/tmux new -A -s ttyd
+student    51885   49602  0 22:32 pts/1    00:00:00 ps -ef
